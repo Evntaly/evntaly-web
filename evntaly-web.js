@@ -3,6 +3,11 @@
     window.evntaly = window.evntaly || function (...args) {
       queue.push(args);
     };
+
+    window.evntalyInit = function (token, projectName) {
+        window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
+        window.evntaly("setConfig", token, projectName);
+      };
   
     let config = { token: null, project: null, trackingEnabled: true };
   
