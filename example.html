@@ -1,11 +1,44 @@
 <html>
     <head>
+        <meta charset="utf-8">
         <title>Ecntaly Example</title>
-        <script async src="https://cdn.evntaly.com/evntaly-web.js"></script>
+        <script async="true" src="https://cdn.evntaly.com/evntaly-web-v1.0.7.js"></script>
+        <script>
+            window.evsq = window.evsq || [];
+            window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
+            window.evntaly("init", "~~", "~~");
+        </script>
+        <script>
+            function addUser() {
+                window.evntaly("identifyUser", {
+                    id: "user-123",
+                    user_id: "user-123",
+                    email: "user1234@example.com",
+                    full_name: "John Doe",
+                    organization: "Example Corp",
+                    data : {
+                        plan: "Pro",
+                        period: "Monthly",
+                        price: 9.99
+                    }
+                });
+            }
+        </script>
     </head>
     <body>
         <h1>Hello World</h1>
         <p>This is a Ecntaly Example</p>
-        <button>Click me</button>
+        <button
+            data-event="Upgraded Plan"
+            data-user-id="user-123"
+            data-topic="@billing"
+            data-icon="💰"
+            data-tag-plan="Pro"
+            data-tag-period="Monthly"
+            data-tag-price="9.99"
+            data-payload-country="Egypt">
+                Upgrade to Pro
+        </button>
+        <button onclick="addUser()">Add user</button>
     </body>
 </html>

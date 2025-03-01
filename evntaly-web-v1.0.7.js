@@ -1,20 +1,16 @@
 (function () {
+
     const queue = (window.evsq = window.evsq || []); // evsq = Event Queue System
     window.evntaly = window.evntaly || function (...args) {
       queue.push(args);
     };
-
-    window.evntalyInit = function (token, projectName) {
-        window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
-        window.evntaly("setConfig", token, projectName);
-      };
   
     let config = { token: null, project: null, trackingEnabled: true };
   
     function processQueue() {
       while (queue.length > 0) {
         const [command, ...args] = queue.shift();
-        if (command === "setConfig") setConfig(...args);
+        if (command === "init") setConfig(...args);
         if (command === "track") trackEvent(...args);
         if (command === "identifyUser") identifyUser(...args);
         if (command === "disableTracking") disableTracking();
@@ -33,25 +29,31 @@
         return;
       }
       if (!config.token) {
-        console.error("Evntaly: Missing API token. Call window.evntaly('setConfig', 'TOKEN', 'PROJECT_NAME') first.");
+        console.error("Evntaly: Missing API token. Call window.evntaly('Init', 'TOKEN', 'PROJECT_NAME') first.");
         return;
       }
   
-      fetch("https://evntaly.com/prod/api/v1/register/user", {
+      fetch("https://evntaly.com/prod/api/v1/register/event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Project-Token": config.token,
+          "secret": config.token,
+          "pat": config.project,
         },
         body: JSON.stringify({
           title: eventData.event,
           description: "User interaction",
           message: "Automatically tracked event.",
-          data: eventData.tags,
+          data: eventData.data || {},
           user: { id: eventData.userId || "anonymous" },
-          feature: eventData.channel || "events",
           icon: eventData.icon || "ℹ️",
-          type: "Button Click",
+          apply_rule_only: true,
+          notify: true,
+          type: "",
+          sessionID: eventData.sessionID || null,
+          feature: eventData.channel || "events",
+          topic: eventData.topic || "@auto-generated event",
+          tags: eventData.tags || [],
         }),
       });
     }
@@ -61,11 +63,12 @@
         console.error("Evntaly: Missing API token. Call window.evntaly('setConfig', 'TOKEN', 'PROJECT_NAME') first.");
         return;
       }
-      fetch("https://evntaly.com/prod/api/v1/identify/user", {
+      fetch("https://evntaly.com/prod/api/v1/register/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Project-Token": config.token,
+          "secret": config.token,
+          "pat": config.project,
         },
         body: JSON.stringify(userData),
       });
@@ -90,13 +93,36 @@
         userId: button.getAttribute("data-user-id") || null,
         channel: button.getAttribute("data-channel") || "events",
         icon: button.getAttribute("data-icon") || null,
-        tags: {},
+        data: {
+          url: window.location.href,
+          referrer: document.referrer,
+          utm: {
+            source: new URLSearchParams(window.location.search).get("utm_source") || null,
+            medium: new URLSearchParams(window.location.search).get("utm_medium") || null,
+            campaign: new URLSearchParams(window.location.search).get("utm_campaign") || null,
+            term: new URLSearchParams(window.location.search).get("utm_term") || null
+          },
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          appVersion: navigator.appVersion,
+          language: navigator.language,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          networkConnectionType: navigator.connection.effectiveType, 
+        },
+        tags: [],
       };
   
       [...button.attributes].forEach(attr => {
         if (attr.name.startsWith("data-tag-")) {
           const tagName = attr.name.replace("data-tag-", "");
-          eventData.tags[tagName] = attr.value;
+          eventData.tags.push(`${tagName}:${attr.value}`);
+        }
+      });
+
+      [...button.attributes].forEach(attr => {
+        if (attr.name.startsWith("data-payload-")) {
+          const tagName = attr.name.replace("data-payload-", "");
+          eventData.data[tagName] = attr.value;
         }
       });
   
@@ -108,11 +134,25 @@
       const eventData = {
         event: "Page Viewed",
         userId: null,
-        channel: "navigation",
-        tags: {
+        topic: "@navigation",
+        data: {
           url: window.location.href,
           referrer: document.referrer,
+          utm: {
+            source: new URLSearchParams(window.location.search).get("utm_source") || null,
+            medium: new URLSearchParams(window.location.search).get("utm_medium") || null,
+            campaign: new URLSearchParams(window.location.search).get("utm_campaign") || null,
+            term: new URLSearchParams(window.location.search).get("utm_term") || null
+          },
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          appVersion: navigator.appVersion,
+          language: navigator.language,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          networkConnectionType: navigator.connection.effectiveType, 
         },
+        type: "pageview",
+        icon: '🔥',
       };
       window.evntaly("track", eventData);
     }
