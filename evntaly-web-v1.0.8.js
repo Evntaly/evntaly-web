@@ -33,7 +33,7 @@
         return;
       }
   
-      fetch("https://evntaly.com/prod/api/v1/register/event", {
+      fetch("https://app.evntaly.com/prod/api/v1/register/event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@
         console.error("Evntaly: Missing API token. Call window.evntaly('setConfig', 'TOKEN', 'PROJECT_NAME') first.");
         return;
       }
-      fetch("https://evntaly.com/prod/api/v1/register/user", {
+      fetch("https://app.evntaly.com/prod/api/v1/register/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
