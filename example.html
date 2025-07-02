@@ -2,11 +2,13 @@
     <head>
         <meta charset="utf-8">
         <title>Ecntaly Example</title>
-        <script async="true" src="https://cdn.evntaly.com/evntaly-web-v1.0.8.js"></script>
+        <script async="true" src="./evntaly-web-v1.0.9.js"></script>
         <script>
             window.evsq = window.evsq || [];
             window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
-            window.evntaly("init", "2f550c2ed45f34be" , "603acc2923f26bedeb8cd61809dc8de7");
+            window.evntaly("init", "3f50d965ea75e891" , "81753c32cdb8013bbd23f0d10717", {
+                disableAutoPageViewTracking: false
+            });
         </script>
         <script>
             function addUser() {
