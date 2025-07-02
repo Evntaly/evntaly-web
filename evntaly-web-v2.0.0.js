@@ -7,8 +7,8 @@
   
     let config = { token: null, project: null, trackingEnabled: true };
     let sdkVersion = "1.0.10"; 
-    // const apiBaseUrl = "https://app.evntaly.com/prod/api/v1";
-    const apiBaseUrl = "http://localhost:3000/api/v1";
+    const apiBaseUrl = "https://app.evntaly.com/prod/api/v1";
+    // const apiBaseUrl = "http://localhost:3000/api/v1";
     let isSetupComplete = false; // Track whether setup has been done
     let hasLoadFired = false; // Track if load event already fired
     let locationCache = null; // Cache location data to avoid repeated API calls
