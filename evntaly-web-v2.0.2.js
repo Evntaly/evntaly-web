@@ -492,7 +492,7 @@
         userAgent: navigator.userAgent || null,
         referer: document.referrer || null,
         method: 'GET',
-        url: window.location.href || null,
+        url: `${window.location.pathname}${window.location.search}${window.location.hash}` || null,
         host: window.location.host || null,
         origin: window.location.origin || null,
         acceptLanguage: navigator.language || null,
