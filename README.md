@@ -2,7 +2,7 @@
   <img src="https://cdn.evntaly.com/Resources/og.png" alt="Evntaly Cover" width="100%">
 </p>
 
-<h3 align="center">Evntaly Web SDK v1.0.10</h3>
+<h3 align="center">Evntaly Web SDK v2.0.2</h3>
 
 <p align="center">
  An advanced event tracking and analytics platform designed to help developers capture, analyze, and react to user interactions efficiently.
