@@ -136,7 +136,7 @@ window.evntaly("init", "YOUR_API_TOKEN", "YOUR_PROJECT_NAME", {
 ## What's New in v1.0.10
 
 ### 🌍 **Automatic Location Detection**
-- IP-based geolocation using free APIs
+- IP-based geolocation
 - Includes country, region, city, timezone, and coordinates
 - Cached for performance (one request per session)
 
