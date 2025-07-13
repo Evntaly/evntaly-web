@@ -31,7 +31,7 @@
 Add the following to your HTML file:
 
 ```html
-<script async src="https://cdn.evntaly.com/evntaly-web-v1.0.2.js"></script>
+<script async src="https://cdn.evntaly.com/evntaly-web-v2.0.2.js"></script>
 <script>
     window.evntaly("init", "YOUR_API_TOKEN", "YOUR_PROJECT_NAME");
 </script>
