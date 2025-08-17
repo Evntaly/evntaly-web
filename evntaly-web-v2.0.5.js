@@ -706,7 +706,8 @@
           sdkRuntime: "browser",
           operatingSystem: os,
           browser: browser
-        }
+        },
+        topic: button.getAttribute("data-topic") || "@auto-generated-event"
       };  
   
       [...button.attributes].forEach(attr => {
