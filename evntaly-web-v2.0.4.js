@@ -13,7 +13,98 @@
     let hasLoadFired = false; // Track if load event already fired
     let locationCache = null; // Cache location data to avoid repeated API calls
     let locationPromise = null; // Track ongoing location fetch
-  
+        let sessionId = null; // Store the session ID
+    let userId = null; // Store the user ID
+
+    /**
+     * Generate a unique session identifier that persists for the browser session.
+     * Uses sessionStorage to maintain the same ID across page reloads within the same tab/window.
+     * @returns {string} A unique session identifier
+     */
+    function generateSessionId() {
+      // Try to get existing session ID from sessionStorage
+      try {
+        const existingSessionId = sessionStorage.getItem('evntaly_session_id');
+        if (existingSessionId) {
+          return existingSessionId;
+        }
+      } catch (e) {
+        // sessionStorage might not be available (private browsing, etc.)
+        console.warn('Evntaly: sessionStorage not available, using temporary session ID');
+      }
+
+      // Generate new session ID: timestamp + random string
+      const timestamp = Date.now().toString(36);
+      const randomPart = Math.random().toString(36).substring(2, 8);
+      const newSessionId = `evs_${timestamp}_${randomPart}`;
+
+      // Try to store in sessionStorage for persistence across page loads
+      try {
+        sessionStorage.setItem('evntaly_session_id', newSessionId);
+      } catch (e) {
+        // Storage might be full or disabled, continue without storing
+        console.warn('Evntaly: Could not store session ID in sessionStorage');
+      }
+
+      return newSessionId;
+    }
+
+    /**
+     * Get the current session ID, generating one if it doesn't exist
+     * @returns {string} The current session identifier
+     */
+    function getSessionId() {
+      if (!sessionId) {
+        sessionId = generateSessionId();
+      }
+      return sessionId;
+    }
+
+    /**
+     * Generate a unique user identifier that persists across browser sessions.
+     * Uses localStorage to maintain the same ID across visits to your website.
+     * @returns {string} A unique user identifier
+     */
+    function generateUserId() {
+      // Try to get existing user ID from localStorage
+      try {
+        const existingUserId = localStorage.getItem('evntaly_user_id');
+        if (existingUserId) {
+          return existingUserId;
+        }
+      } catch (e) {
+        // localStorage might not be available (private browsing, etc.)
+        console.warn('Evntaly: localStorage not available, using temporary user ID');
+      }
+
+      // Generate new user ID: timestamp + random string (longer than session ID)
+      const timestamp = Date.now().toString(36);
+      const randomPart = Math.random().toString(36).substring(2, 10);
+      const additionalRandom = Math.random().toString(36).substring(2, 6);
+      const newUserId = `evu_${timestamp}_${randomPart}_${additionalRandom}`;
+
+      // Try to store in localStorage for persistence across sessions
+      try {
+        localStorage.setItem('evntaly_user_id', newUserId);
+      } catch (e) {
+        // Storage might be full or disabled, continue without storing
+        console.warn('Evntaly: Could not store user ID in localStorage');
+      }
+
+      return newUserId;
+    }
+
+    /**
+     * Get the current user ID, generating one if it doesn't exist
+     * @returns {string} The current user identifier
+     */
+    function getUserId() {
+      if (!userId) {
+        userId = generateUserId();
+      }
+      return userId;
+    }
+
     // Check if document already loaded
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       hasLoadFired = true;
@@ -492,7 +583,7 @@
         userAgent: navigator.userAgent || null,
         referer: document.referrer || null,
         method: 'GET',
-        url: `${window.location.pathname}${window.location.search}${window.location.hash}` || null,
+        url: window.location.pathname || null,
         host: window.location.host || null,
         origin: window.location.origin || null,
         acceptLanguage: navigator.language || null,
@@ -537,12 +628,12 @@
           description: "User interaction",
           message: "Automatically tracked event.",
           data: eventData.data || {},
-          user: { id: eventData.userId || "anonymous" },
+          user: { id: eventData.userId || getUserId() },
           icon: eventData.icon || "ℹ️",
           apply_rule_only: true,
           notify: true,
           type: eventData.type || "Event",
-          sessionID: eventData.sessionID || null,
+          sessionID: eventData.sessionID || getSessionId(),
           feature: eventData.channel || "events",
           topic: eventData.topic || "@auto-generated event",
           tags: eventData.tags || [],
@@ -590,11 +681,11 @@
 
       const eventData = {
         event: button.getAttribute("data-event"),
-        userId: button.getAttribute("data-user-id") || null,
+        userId: button.getAttribute("data-user-id") || getUserId(),
         channel: button.getAttribute("data-channel") || "events",
         icon: button.getAttribute("data-icon") || null,
         data: {
-          url: window.location.href,
+          url: window.location.pathname,
           referrer: document.referrer,
           utm: {
             source: new URLSearchParams(window.location.search).get("utm_source") || null,
@@ -642,10 +733,10 @@
 
       const eventData = {
         event: "Page Viewed",
-        userId: null,
+        userId: getUserId(),
         topic: "@navigation",
         data: {
-          url: window.location.href,
+          url: window.location.pathname,
           referrer: document.referrer,
           utm: {
             source: new URLSearchParams(window.location.search).get("utm_source") || null,
@@ -661,7 +752,7 @@
           networkConnectionType: getNetworkConnectionType(),
         },
         type: "Page View",
-        icon: '🔥',
+        icon: '🤓',
         context: {
           sdkVersion: sdkVersion,
           sdkRuntime: "browser",

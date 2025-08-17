@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Evntaly User & Session ID Test</title>
+    <script async="true" src="./evntaly-web-v2.0.4.min.js"></script>
+    <script>
+        window.evsq = window.evsq || [];
+        window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
+        window.evntaly("init", "a8b331c0221343ec", "c176fe22342981482455f5e5c6802ab2", {
+            disableAutoPageViewTracking: false
+        });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        button { margin: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .info-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .code { background: #e9ecef; padding: 5px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Evntaly User & Session ID Test</h1>
+    
+    <div class="info-box">
+        <h3>How it works:</h3>
+        <ul>
+            <li><strong>User ID:</strong> Persists across browser sessions (stored in localStorage)</li>
+            <li><strong>Session ID:</strong> New for each browser session (memory only)</li>
+            <li>Both IDs are automatically included with every event</li>
+        </ul>
+    </div>
+
+    <div>
+        <button onclick="showCurrentIds()">Show Current IDs</button>
+        <button onclick="sendTestEvent()">Send Test Event</button>
+        <button onclick="clearUserData()">Clear User Data</button>
+    </div>
+
+    <div id="output" class="info-box" style="display: none;">
+        <h3>Current IDs:</h3>
+        <div id="ids-display"></div>
+    </div>
+
+    <div class="info-box">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Click "Show Current IDs" to see your unique identifiers</li>
+            <li>Open browser DevTools → Network tab</li>
+            <li>Click "Send Test Event" and check the request payload</li>
+            <li>Refresh the page - User ID stays same, Session ID changes</li>
+            <li>Close browser and reopen - User ID stays same, Session ID is new</li>
+            <li>Click "Clear User Data" to reset the User ID</li>
+        </ol>
+    </div>
+
+    <script>
+        function showCurrentIds() {
+            const output = document.getElementById('output');
+            const display = document.getElementById('ids-display');
+            
+            // Get stored IDs
+            const storedUserId = localStorage.getItem('evntaly_user_id');
+            const storedSessionId = sessionStorage.getItem('evntaly_session_id');
+            
+            display.innerHTML = `
+                <p><strong>User ID (localStorage):</strong> <span class="code">${storedUserId || 'Not generated yet'}</span></p>
+                <p><strong>Session ID (memory):</strong> <span class="code">${storedSessionId || 'Not generated yet'}</span></p>
+                <p><em>Note: IDs are generated when first event is sent</em></p>
+            `;
+            
+            output.style.display = 'block';
+        }
+
+        function sendTestEvent() {
+            window.evntaly("track", {
+                event: "Test Event",
+                channel: "testing",
+                icon: "🧪",
+                data: {
+                    test: true,
+                    timestamp: new Date().toISOString(),
+                    message: "This event includes auto-generated User ID and Session ID"
+                }
+            });
+            
+            alert("Test event sent! Check the Network tab in DevTools to see the User ID and Session ID in the request payload.");
+            
+            // Update display after event is sent
+            setTimeout(showCurrentIds, 100);
+        }
+
+        function clearUserData() {
+            try {
+                localStorage.removeItem('evntaly_user_id');
+                sessionStorage.removeItem('evntaly_session_id');
+                alert("User data cleared! Next event will generate new IDs.");
+                showCurrentIds();
+            } catch (e) {
+                alert("Could not clear user data: " + e.message);
+            }
+        }
+
+        // Show IDs on page load
+        window.addEventListener('load', function() {
+            setTimeout(showCurrentIds, 500);
+        });
+    </script>
+</body>
+</html>

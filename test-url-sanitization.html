@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Evntaly URL Sanitization Test</title>
+    <script async="true" src="./evntaly-web-v2.0.4.js"></script>
+    <script>
+        window.evsq = window.evsq || [];
+        window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
+        window.evntaly("init", "a8b331c0221343ec", "c176fe22342981482455f5e5c6802ab2", {
+            disableAutoPageViewTracking: false
+        });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        button { margin: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .info-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .code { background: #e9ecef; padding: 5px; border-radius: 3px; font-family: monospace; }
+        .comparison { display: flex; gap: 20px; }
+        .comparison > div { flex: 1; }
+        .before { background: #f8d7da; border-color: #f5c6cb; }
+        .after { background: #d1edff; border-color: #b6d4fe; }
+    </style>
+</head>
+<body>
+    <h1>Evntaly URL Sanitization Test</h1>
+    
+    <div class="info-box">
+        <h3>URL Sanitization Behavior:</h3>
+        <p>The SDK now captures <strong>clean URLs only</strong> - no query strings or hash fragments.</p>
+    </div>
+
+    <div class="comparison">
+        <div class="info-box before">
+            <h4>❌ Before (Full URL)</h4>
+            <p><strong>Example:</strong></p>
+            <p class="code">/products/shoes?color=red&size=10&utm_source=google#reviews</p>
+            <p>Contains: path + query + hash</p>
+        </div>
+        
+        <div class="info-box after">
+            <h4>✅ After (Clean URL)</h4>
+            <p><strong>Same example becomes:</strong></p>
+            <p class="code">/products/shoes</p>
+            <p>Contains: path only</p>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h3>Current Page Analysis:</h3>
+        <p><strong>Full URL:</strong> <span class="code" id="full-url"></span></p>
+        <p><strong>Clean URL (sent in events):</strong> <span class="code" id="clean-url"></span></p>
+        <p><strong>UTM Parameters (still tracked separately):</strong></p>
+        <ul id="utm-list"></ul>
+    </div>
+
+    <div>
+        <button onclick="sendTestEvent()">Send Test Event</button>
+        <button onclick="changeUrl()">Test with Query Parameters</button>
+        <button onclick="addHashFragment()">Test with Hash Fragment</button>
+    </div>
+
+    <div class="info-box">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Open browser DevTools → Network tab</li>
+            <li>Click "Send Test Event" and check the request payload</li>
+            <li>Look for the <code>url</code> field in the event data</li>
+            <li>Try the other buttons to test different URL formats</li>
+            <li>Notice how the URL is always clean, but UTM parameters are preserved separately</li>
+        </ol>
+    </div>
+
+    <script>
+        function updatePageAnalysis() {
+            document.getElementById('full-url').textContent = window.location.href;
+            document.getElementById('clean-url').textContent = window.location.pathname;
+            
+            const utmList = document.getElementById('utm-list');
+            const params = new URLSearchParams(window.location.search);
+            const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+            
+            utmList.innerHTML = '';
+            let hasUtm = false;
+            
+            utmParams.forEach(param => {
+                const value = params.get(param);
+                if (value) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<code>${param}</code>: ${value}`;
+                    utmList.appendChild(li);
+                    hasUtm = true;
+                }
+            });
+            
+            if (!hasUtm) {
+                const li = document.createElement('li');
+                li.textContent = 'No UTM parameters found';
+                utmList.appendChild(li);
+            }
+        }
+
+        function sendTestEvent() {
+            window.evntaly("track", {
+                event: "URL Sanitization Test",
+                channel: "testing",
+                icon: "🧪",
+                data: {
+                    test: true,
+                    timestamp: new Date().toISOString(),
+                    note: "Check the 'url' field in the request payload - it should be clean!"
+                }
+            });
+            
+            alert("Test event sent! Check the Network tab to see the clean URL in the request payload.");
+        }
+
+        function changeUrl() {
+            const newUrl = window.location.pathname + '?color=red&size=10&utm_source=test&utm_medium=demo';
+            history.pushState({}, '', newUrl);
+            updatePageAnalysis();
+            alert("URL changed! Now send a test event to see how it's captured.");
+        }
+
+        function addHashFragment() {
+            const newUrl = window.location.href + '#section1';
+            history.pushState({}, '', newUrl);
+            updatePageAnalysis();
+            alert("Hash fragment added! Send a test event to see the clean URL.");
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            updatePageAnalysis();
+        });
+
+        // Update when URL changes
+        window.addEventListener('popstate', function() {
+            updatePageAnalysis();
+        });
+    </script>
+</body>
+</html>
