@@ -2,12 +2,15 @@
     <head>
         <meta charset="utf-8">
         <title>Ecntaly Example</title>
-        <script async="true" src="./evntaly-web-v2.0.2.js"></script>
+        <script async="true" src="./evntaly-web-v2.0.6.js"></script>
         <script>
             window.evsq = window.evsq || [];
             window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
-            window.evntaly("init", "e12fb0ed7462c2fc" , "e712a7a7cacc1a77f1b416bdac3d", {
-                disableAutoPageViewTracking: false
+            window.evntaly("init", {
+                clientID: "e712a7a7cacc1a77f1b416bdac3d",
+                token: "e12fb0ed7462c2fc",
+                trackScreenViews: true,
+                trackingEnabled: true
             });
         </script>
         <script>

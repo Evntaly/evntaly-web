@@ -6,15 +6,14 @@
     };
   
     let config = { token: null, project: null, trackingEnabled: true };
-    let sdkVersion = "1.0.10"; 
+    let sdkVersion = "2.0.6"; 
     const apiBaseUrl = "https://app.evntaly.com/prod/api/v1";
-    // const apiBaseUrl = "http://localhost:3000/api/v1";
-    let isSetupComplete = false; // Track whether setup has been done
-    let hasLoadFired = false; // Track if load event already fired
-    let locationCache = null; // Cache location data to avoid repeated API calls
-    let locationPromise = null; // Track ongoing location fetch
-        let sessionId = null; // Store the session ID
-    let userId = null; // Store the user ID
+    let isSetupComplete = false; 
+    let hasLoadFired = false; 
+    let locationCache = null; 
+    let locationPromise = null; 
+    let sessionId = null; 
+    let userId = null; 
 
     /**
      * Generate a unique session identifier that persists for the browser session.
@@ -145,10 +144,18 @@
       }
     }
   
-    function setConfig(token, projectName, options = {}) {
-      config.token = token;
-      config.project = projectName;
-      config.disableAutoPageViewTracking = !!options.disableAutoPageViewTracking;
+    function setConfig(options) {
+      if (!options || typeof options !== 'object') {
+        console.error("Evntaly: Configuration must be an object with { clientID, token, trackScreenViews, trackingEnabled } properties");
+        return;
+      }
+      
+      config.token = options.token;
+      config.project = options.clientID;
+      // trackScreenViews controls auto page view tracking (inverted logic)
+      config.disableAutoPageViewTracking = options.trackScreenViews === false;
+      // trackingEnabled controls overall tracking (defaults to true if not specified)
+      config.trackingEnabled = options.trackingEnabled !== false;
     }
 
     /**

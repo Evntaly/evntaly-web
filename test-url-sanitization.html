@@ -3,12 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>Evntaly URL Sanitization Test</title>
-    <script async="true" src="./evntaly-web-v2.0.4.js"></script>
+    <script async="true" src="./evntaly-web-v2.0.6.js"></script>
     <script>
         window.evsq = window.evsq || [];
         window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
-        window.evntaly("init", "a8b331c0221343ec", "c176fe22342981482455f5e5c6802ab2", {
-            disableAutoPageViewTracking: false
+        window.evntaly("init", {
+            clientID: "c176fe22342981482455f5e5c6802ab2",
+            token: "a8b331c0221343ec",
+            trackScreenViews: true,
         });
     </script>
     <style>
