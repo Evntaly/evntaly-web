@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <title>Evntaly URL Sanitization Test</title>
-    <script async="true" src="./evntaly-web-v2.0.6.js"></script>
+    <script async="true" src="./evntaly-web-v2.0.7.js"></script>
     <script>
         window.evsq = window.evsq || [];
         window.evntaly = window.evntaly || ((...args) => window.evsq.push(args));
         window.evntaly("init", {
-            clientID: "c176fe22342981482455f5e5c6802ab2",
-            token: "a8b331c0221343ec",
+            clientID: "a8b331c0221343ec",
+            token: "c176fe22342981482455f5e5c6802ab2",
             trackScreenViews: true,
         });
     </script>
@@ -101,6 +101,15 @@
                 li.textContent = 'No UTM parameters found';
                 utmList.appendChild(li);
             }
+        }
+
+        function sendTestEvent() {
+            window.evntaly("identifyUser", {
+                id: "1234567890",
+                name: "John Doe",
+                email: "john.doe@example.com"
+            });
+            
         }
 
         function sendTestEvent() {

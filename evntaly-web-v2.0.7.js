@@ -150,8 +150,8 @@
         return;
       }
       
-      config.token = options.token;
-      config.project = options.clientID;
+      config.token = options.clientID;
+      config.project = options.token;
       // trackScreenViews controls auto page view tracking (inverted logic)
       config.disableAutoPageViewTracking = options.trackScreenViews === false;
       // trackingEnabled controls overall tracking (defaults to true if not specified)
